@@ -1,0 +1,101 @@
+{% extends 'shopkeeper/shopkeeper_dashboard.html' %}
+
+{% block title %}Shopkeeper Orders{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Shopkeeper Orders</h1>
+
+    {% if orders %}
+        <table class="table table-striped table-responsive">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Total Amount</th>
+                    <th>Description</th>
+                    <th>Items</th>
+                    <th>Update Delivery Status</th> <!-- Updated header -->
+                    <th>Delivery Status</th> <!-- New column for delivery status -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.order_id }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>${{ total_amounts[order.order_id] }}</td> <!-- Display total amount for the order -->
+                        <td>{{ order.order_description }}</td>
+                        <td>
+                            <button class="btn btn-info btn-sm" type="button" data-toggle="collapse" data-target="#order-items-{{ order.order_id }}" aria-expanded="false" aria-controls="order-items-{{ order.order_id }}">
+                                View Items
+                            </button>
+                            <div class="collapse mt-3" id="order-items-{{ order.order_id }}">
+                                <div class="card card-body">
+                                    {% if order.order_id in order_items %}
+                                        <ul class="list-unstyled">
+                                            {% for item in order_items[order.order_id] %}
+                                                <li class="order-item mb-3">
+                                                    <div class="d-flex align-items-start">
+                                                        <img src="{{ url_for('static', filename='products/images/' + item.product_image) }}" alt="{{ item.product_name }}" class="img-thumbnail mr-3" style="width: 100px; height: 100px;">
+                                                        <div>
+                                                            <strong>Product Name:</strong> {{ item.product_name }}<br>
+                                                            <strong>Description:</strong> {{ item.product_description }}<br>
+                                                            <strong>Price:</strong> ${{ item.selling_price }} x {{ item.quantity }}<br>
+                                                            <strong>Total:</strong> ${{ item.selling_price * item.quantity }} <!-- Total amount for the product -->
+                                                            <br>
+                                                            <strong>Delivery Status:</strong> {{ item.delivery_status }} <!-- Display delivery status -->
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <div class="alert alert-info">
+                                            No items found for this order.
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <form class="update-delivery-form" action="{{ url_for('shopkeeper_bp.update_delivery_status', order_id=order.order_id) }}" method="POST">
+                                <input type="hidden" name="delivery_status" value="Delivered">
+                                <button type="submit" class="btn btn-success btn-sm">Mark as Delivered</button>
+                            </form>
+                            
+                        </td>
+                        <td>
+                            <!-- Correct the reference to item -->
+                            {% if order.order_id in order_items %}
+                                <span class="font-weight-bold">
+                                    {% for item in order_items[order.order_id] %}
+                                        {{ item.delivery_status }}
+                                    {% endfor %}
+                                </span>
+                            {% else %}
+                                <span class="font-weight-bold">N/A</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info">
+            No orders found for your shop.
+        </div>
+    {% endif %}
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+<script>
+    // Custom JavaScript can be added here if necessary
+</script>
+{% endblock %}

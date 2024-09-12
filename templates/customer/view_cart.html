@@ -1,0 +1,281 @@
+{% include 'navbar.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+    
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Container for left and right partitions */
+        .cart-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        /* Style for left partition (cart details) */
+        .cart-details {
+            flex: 2;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; /* Allow vertical scrolling */
+            max-height: 600px; /* Adjust this value based on your needs */
+        }
+
+        /* Style for right partition (totals) */
+        .cart-totals {
+            flex: 1;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            border-left: 1px solid #ddd;
+        }
+
+        .media-object {
+            max-width: 100%;
+            max-height: 100px; /* Adjust this value to fit within your layout */
+            height: auto;
+            object-fit: cover; /* Ensure the image covers the allocated space without stretching */
+        }
+
+        .btn-danger, .btn-success {
+            margin-top: 10px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table thead th {
+            font-weight: bold;
+            text-align: left;
+            padding: 10px;
+            background-color: #f1f1f1;
+        }
+
+        .table tbody td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .right-side {
+            text-align: right;
+        }
+
+        .subtotal, .shipping, .total {
+            text-align: right;
+        }
+
+        .total strong {
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .media {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px; /* Add margin to separate items */
+        }
+
+        .media-body {
+            margin-left: 10px; /* Reduce margin for a more compact layout */
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 767px) {
+            .cart-container {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .cart-totals {
+                border-left: none;
+                margin-top: 20px;
+            }
+
+            .media {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .media-body {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .media-object {
+                max-height: 80px; /* Adjust for smaller screens */
+            }
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.quantity-input').on('input', function() {
+                var $row = $(this).closest('tr');
+                var quantity = parseFloat($(this).val()) || 0;
+                var discountedPrice = parseFloat($row.find('.discounted-price strong').text().replace('₹', '')) || 0;
+                var totalPrice = quantity * discountedPrice;
+                $row.find('.total-price strong').text('₹' + totalPrice.toFixed(2));
+                updateCartTotal();
+            });
+
+            function updateCartTotal() {
+                var subtotal = 0;
+                $('.total-price strong').each(function() {
+                    subtotal += parseFloat($(this).text().replace('₹', '')) || 0;
+                });
+                var shipping = subtotal > 600 ? 0 : 40;
+                var total = subtotal + shipping;
+
+                $('.subtotal strong').text('₹' + subtotal.toFixed(2));
+                $('.shipping strong').text('₹' + shipping.toFixed(2));
+                $('.total strong').text('₹' + total.toFixed(2));
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Cart</h1>
+
+        <!-- Error message display -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="cart-container">
+            <!-- Left partition: Cart Details -->
+            <div class="cart-details">
+                {% if cart_items %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th class="text-center">Discounted Price</th>
+                                <th class="text-center">Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                                <tr>
+                                    <td>
+                                   
+                                            <div class="media-body"> 
+                                                <img class="media-object" src="{{ url_for('static', filename='products/images/' ~ item.image) }}" alt="{{ item.name }}">
+                                     
+                                                <h5 class="media-heading">
+                                                    <a href="#">{{ item.name }}</a>
+                                                </h4>
+                                                <h6 class="media-heading">
+                                                    by <a href="#">{{ item.brand_name }}</a>
+                                                </h5>
+                                                <p>{{ item.description }}</p>
+                                                <p><strong>Shop:</strong> {{ item.shop_name }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="number" class="form-control quantity-input" value="{{ item.quantity }}" min="1">
+                                    </td>
+                                    <td class="text-center discounted-price"><strong>₹{{ item.discounted_price }}</strong></td>
+                                    <td class="text-center total-price"><strong>₹{{ item.discounted_price * item.quantity }}</strong></td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('customer_bp.remove_from_cart') }}">
+                                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                                            <button type="submit" class="btn btn-danger">
+                                                <span class="glyphicon glyphicon-remove"></span> Remove
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="text-center">
+                        <p>Your cart is empty.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Right partition: Totals -->
+            <div class="cart-totals">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <tr >
+                                
+                                    <a href="{{ url_for('customer_bp.explore') }}" class="btn btn-default">
+                                        <i class="fas fa-chevron-left"></i> Continue Shopping
+                                    </a>
+                                
+                            </tR>
+                            <HR>
+                         
+                        </tr>
+                        <tr>
+                            <td><h5>Subtotal</h5></td>
+                            <td class="right-side subtotal"><h5><strong>₹{{ subtotal }}</strong></h5></td>
+                        </tr>
+                        <tr>
+                            <td><h5>Estimated Shipping</h5></td>
+                            <td class="right-side shipping"><h5><strong>₹{{ shipping }}</strong></h5></td>
+                        </tr>
+                        <tr>
+                            <td><h3>Total</h3></td>
+                            <td class="right-side total"><h3><strong>₹{{ total }}</strong></h3></td>
+                        </tr>   <td colspan="2" class="text-right">
+                            <a href="{{ url_for('customer_bp.checkout') }}" class="btn btn-success">Checkout <span class="glyphicon glyphicon-chevron-right"></span></a>
+                        </td>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+
+<nav class="col-md-2 d-none d-md-block bg-dark sidebar">
+    <div class="sidebar-sticky">
+        <ul class="nav flex-column list-group">
+            <li class="nav-item list-group-item">
+                <a class="nav-link active" href="{{ url_for('admin_bp.admin_dashboard') }}">
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item list-group-item">
+                <a class="nav-link" href="{{ url_for('admin_bp.approval') }}">
+                    Approve Shops
+                </a>
+            </li>
+
+            <li class="nav-item list-group-item">
+                <a class="nav-link" href="{{ url_for('category_bp.list_core_categories') }}">
+                    List CoreCategories
+                </a>
+            </li>
+            <li class="nav-item list-group-item">
+                <a class="nav-link" href="{{ url_for('category_bp.list_subcategories') }}">
+                    List Subcategories
+                </a>
+            </li>
+            <li class="nav-item list-group-item">
+                <a class="nav-link" href="{{ url_for('admin_bp.list_approved_shopkeepers') }}">
+                    List of Approved Shops
+                </a>
+            </li>
+            <li class="nav-item list-group-item">
+                <a class="nav-link" href="{{ url_for('admin_bp.view_customers') }}">
+                    View Customers
+                </a>
+            </li>
+           
+            
+        </ul>
+    </div>
+</nav>

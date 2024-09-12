@@ -1,0 +1,220 @@
+{% include 'navbar.html' %}
+{% block content %}
+<!-- Product Page Content -->
+<div class="container">
+    <div class="product-nav">
+        <nav>
+            <a href="{{ url_for('home') }}">
+                <div class="product-nav-left">Back to Home</div>
+            </a>
+        </nav>
+        <nav>
+            <i id="wishlist-icon-{{ product[0] }}" class="fas fa-heart wishlist-icon {% if product[0] in wishlist %}text-danger{% endif %}" onclick="toggleWishlist({{ product[0] }})"></i>
+        </nav>
+    </div>
+    <div class="product-card">
+        <div class="product-photo">
+            <img src="{{ url_for('static', filename='products/images/' ~ product[4]) }}" alt="{{ product[1] }} Image" class="mb-3">
+        </div>
+        <div class="product-description">
+            <h2>{{ product[1] }}</h2>
+            <p><strong>Description:</strong> {{ product[2] }}</p>
+            <p><strong>Category:</strong> {{ product[8] }}</p>
+            <p><strong>Brand:</strong> {{ product[9] }}</p>
+            <p><strong>Shopkeeper:</strong> {{ product[10] }}</p>
+            <p><strong> Price:</strong>₹{{ product[3] }}</p>
+            <p><strong>Quantity:</strong> {{ product[6] }}{{ product[7] }}</p>
+              <form id="add-to-cart-form-{{ product[0] }}" action="{{ url_for('customer_bp.add_to_cart') }}" method="POST">
+                <input type="hidden" name="product_id" value="{{ product[0] }}">
+                <button type="button" class="btn btn-primary mb-2 add-to-cart-btn" onclick="addToCart({{ product[0] }})">Add to Cart</button>
+            </form>
+            <div id="success-message" class="alert alert-success" style="display: none;">Product added to cart!</div>
+        </div>
+    </div>
+</div>
+
+<!-- Inline CSS specific to this page -->
+<style>
+    .container {
+        width: 90%;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-top: 4px;
+        padding-bottom: 50px;
+        margin-top: 90px;
+    }
+
+    .product-nav {
+        width: 100%;
+        color: #000000;
+        text-transform: uppercase;
+        padding: 20px;
+        border-bottom: 2px solid #efefef;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .product-nav-left {
+        flex: 1;
+    }
+
+    .product-nav nav {
+        display: flex;
+        align-items: center;
+    }
+
+    .arrow, .heart-icon {
+        height: 15px;
+        width: 15px;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+
+    .heart-icon {
+        height: 24px;
+        width: 24px;
+        transition: fill 0.3s ease;
+    }
+
+    .heart-icon:hover {
+        fill: red;
+    }
+
+    .product-card {
+        display: flex;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.16), 0 2px 10px rgba(0,0,0,0.12);
+        transition: all 0.3s;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #ffffff;
+        margin-top: 20px;
+    }
+
+    .product-card:hover {
+        box-shadow: 0 8px 17px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.19);
+    }
+
+    .product-photo {
+        width: 40%;
+        text-align: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .product-photo img {
+        margin-top: 90px;
+        width: 70%;
+        height: 240px; /* Fixed height for the image */
+        object-fit: cover; /* Ensure the image covers the fixed area */
+        border-radius: 10px;
+    }
+
+    .product-description {
+        width: 60%;
+        padding: 20px;
+        border-left: 2px solid #efefef;
+    }
+
+    .product-description h2 {
+        color: #000000;
+        margin-bottom: 3px;
+        text-transform: uppercase;
+        font-weight: 900;
+        font-size: 26px;
+    }
+
+    .product-description p {
+        font-size: 16px;
+        line-height: 1.5;
+        color: #000000;
+        margin: 15px 0;
+    }
+
+    .product-description button {
+        outline: none;
+        border: 1px solid #554100;
+        padding: 10px 15px;
+        margin-bottom: 15px;
+        color: #515151;
+        text-transform: uppercase;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+        background: #ffffff;
+        margin-right: 10px;
+    }
+
+    .product-description button:hover {
+        background: #f0f0f0;
+        border-color: #8d7b12;
+        color: #000000;
+    }
+
+    #success-message {
+        display: none;
+        padding: 10px;
+        border: 1px solid #d4edda;
+        border-radius: 5px;
+        background-color: #d4edda;
+        color: #155724;
+    }
+</style>
+
+<!-- Inline JavaScript specific to this page -->
+<script>
+    function addToCart(productId) {
+        var form = document.getElementById('add-to-cart-form-' + productId);
+        var formData = new FormData(form);
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        }).then(response => response.json()).then(data => {
+            if (data.success) {
+                document.getElementById('success-message').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('success-message').style.display = 'none';
+                }, 2000);
+            } else {
+                alert('Please Login to add item to cart.');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function toggleWishlist(productId) {
+        const formData = new FormData();
+        formData.append('product_id', productId);
+
+        fetch('/customer/wishlist/toggle', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const icon = document.querySelector(`#wishlist-icon-${productId}`);
+                if (data.wishlisted) {
+                    icon.classList.add('text-danger'); // Add red color
+                    alert('Product added to wishlist.');
+                } else {
+                    icon.classList.remove('text-danger'); // Remove red color
+                    alert('Product removed from wishlist.');
+                }
+            } else {
+                alert(data.message || 'Failed to toggle wishlist.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An unexpected error occurred. Please try again later.');
+        });
+    }
+</script>
+{% endblock %}

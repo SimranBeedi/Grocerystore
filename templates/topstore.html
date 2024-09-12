@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Stores</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <style>
+        .topstores-header {
+            background-color: #800000; /* Maroon background color */
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topstore-heading {
+            color: #fff;
+            margin-bottom: 0;
+        }
+
+        .topstore-card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+        }
+
+        .topstore-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-img-container {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background-color: #007cf8;
+            border-color: #007cf8;
+            border-radius: 20px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary:hover {
+            background-color: #005bb5;
+            border-color: #004a9d;
+        }
+
+        .show-more-section {
+            display: none;
+        }
+
+        .show-more {
+            cursor: pointer;
+            font-size: 1rem;
+            color: #007cf8;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Top Stores Header -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="topstores-header">
+                    <h1 class="topstore-heading">Top Stores</h1>
+                    <form method="GET" action="{{ url_for('topstore') }}" class="form-inline ml-3">
+                        <div class="form-group">
+                            <label for="locality" class="sr-only">Select Locality:</label>
+                            <select id="locality" name="locality" class="form-control" onchange="this.form.submit()">
+                                <option value="">All Localities</option>
+                                {% for locality in localities %}
+                                <option value="{{ locality[0] }}" {% if locality[0] == selected_locality %}selected{% endif %}>{{ locality[0] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+                 </div>
+                 
+            </div>
+        </div>
+               
+        <div class="row">
+            <!-- Display latest shops -->
+            {% for shop in latest_shops %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card topstore-card">
+                    <div class="row no-gutters">
+                        <div class="col-md-5">
+                            <div class="card-img-container">
+                                <img src="{{ url_for('static', filename='images/' ~ shop[2]) }}" class="card-img" alt="{{ shop[0] }}">
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ shop[0] }}</h5>
+                                <p class="card-text">Locality: {{ shop[1] }}</p>
+                                <a href="{{ url_for('store_detail', shop_name=shop[0]) }}" class="btn btn-primary">View</a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Hidden section for other shops -->
+            <div class="col-12 show-more-section" id="moreShops">
+                <div class="row">
+                    {% for shop in other_shops %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card topstore-card">
+                            <div class="row no-gutters">
+                                <div class="col-md-5">
+                                    <div class="card-img-container">
+                                        <img src="{{ url_for('static', filename='images/' ~ shop[2]) }}" class="card-img" alt="{{ shop[0] }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ shop[0] }}</h5>
+                                        <p class="card-text">Locality: {{ shop[1] }}</p>
+                                        <a href="{{ url_for('store_detail', shop_name=shop[0]) }}" class="btn btn-primary">View</a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 text-center mt-3">
+            <span class="show-more" onclick="toggleMoreShops()">Show More Shops</span>
+        </div>
+    </div>
+
+    <script>
+        function toggleMoreShops() {
+            var moreShops = document.getElementById('moreShops');
+            var showMore = document.querySelector('.show-more');
+            if (moreShops.style.display === 'none' || moreShops.style.display === '') {
+                moreShops.style.display = 'block';
+                showMore.innerText = 'Show Less Shops';
+            } else {
+                moreShops.style.display = 'none';
+                showMore.innerText = 'Show More Shops';
+            }
+        }
+    </script>
+</body>
+</html>

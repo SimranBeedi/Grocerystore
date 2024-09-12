@@ -1,0 +1,39 @@
+<header>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            
+            <a class="navbar-brand" href="#">Admin Dashboard</a>
+    
+            {% if 'admin_logged_in' in session %}
+            <span class="navbar-text text-light mr-3">Welcome, ADMIN!</span>
+            <form class="form-inline" method="post" action="{{ url_for('admin_bp.logout_admin') }}">
+                <button type="submit" class="btn btn-outline-light">Logout</button>
+            </form>
+            {% endif %}
+        </div>
+    </nav>
+</header>
+
+<style>
+    /* Ensure header stays at the top and does not overlap content */
+    header {
+        position: fixed; /* Fix the header at the top */
+        top: 0;
+        left: 0;
+        width: 100%; /* Full width */
+        background-color: #343a40; /* Match with navbar background */
+        z-index: 1000; /* Ensure it stays on top of other elements */
+        padding: 10px 0; /* Optional: adjust padding as needed */
+    }
+
+    /* Style for the navbar */
+    .navbar {
+        margin: 0; /* Remove default margins */
+        color:aquamarine;
+    }
+  
+    /* Add padding to body content to avoid overlap with header */
+    body {
+        padding-top: 56px; /* Adjust based on header height */
+    }
+</style>

@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login/Signup</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/static/fontawesome/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+/* General Body Styling */
+html, body {
+    height: 100%; /* Ensure the html and body cover the full viewport height */
+    margin: 0; /* Remove default margin */
+    overflow: hidden; /* Prevent scrolling */
+}
+
+body {
+    position: relative;
+    background: url('/static/login/home.JPG') no-repeat center center fixed;
+    background-size: cover;
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+body::before {
+    content: '';
+    position: fixed; /* Use fixed positioning to cover the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Use viewport width */
+    height: 100vh; /* Use viewport height */
+    background: rgba(36, 23, 23, 0.4); /* White overlay with 40% opacity */
+    backdrop-filter: blur(8px); /* Apply blur effect */
+    z-index: -1; /* Place the overlay behind the content */
+    pointer-events: none; /* Allow clicks through the overlay */
+}
+
+/* Form Container */
+.form-container {
+    max-width: 500px;
+    margin: 60px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Form Heading */
+.form-container h4 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #2b85d8;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* Labels */
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+/* Inputs */
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+}
+
+/* Input Focus */
+.form-group input:focus {
+    border-color: #37a000;
+    outline: none;
+}
+
+/* Password Requirements */
+.password-requirements {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+/* Primary Button */
+button.btn-primary {
+    background-color: #2b85d8;
+    color: #fff;
+}
+
+/* Primary Button Hover */
+button.btn-primary:hover {
+    background-color: #1c6ea4;
+}
+
+/* Secondary Button */
+button.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+/* Secondary Button Hover */
+button.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Links */
+a {
+    color: #2b85d8;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #1c6ea4;
+}
+
+/* Alerts */
+.flash-messages .alert {
+    margin-bottom: 15px;
+}
+
+/* Password Alert Box */
+.password-alert {
+    display: none;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+}
+
+.password-alert.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-container {
+        margin: 20px;
+        padding: 15px;
+    }
+    
+    button {
+        font-size: 14px;
+        padding: 8px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+          
+        <!-- Login/Signup Modal -->
+        <div class="form-container" id="login-form">
+            <h4>Login</h4>
+            <form method="POST" action="{{ url_for('customer_bp.login_customer') }}">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" class="form-control" id="loginUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <p class="mt-2">Don't have an account? <a href="javascript:void(0)" onclick="showSignupForm()">Sign Up</a></p>
+            </form>
+        </div>
+        
+        <!-- Signup Form -->
+        <div class="form-container" id="signup-form" style="display: none;">
+            <h4>Sign Up</h4>
+            <form method="POST" action="{{ url_for('customer_bp.register') }}">
+                <div class="form-group">
+                    <label for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" name="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" name="email" class="form-control" required>
+                    <button type="button" id="getOtpButton" class="btn btn-secondary">Get OTP</button>
+                    <span id="resendOtp" style="display:none;">
+                        <a href="#" id="resendOtpLink">Resend OTP</a>
+                    </span>
+                </div>
+                <div id="otpSection" style="display:none;">
+                    <div class="form-group">
+                        <label for="otpInput">Enter OTP</label>
+                        <input type="text" id="otpInput" name="otp" class="form-control">
+                        <button type="button" id="verifyOtpButton" class="btn btn-secondary">Verify</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" name="password" class="form-control" required>
+                    <div id="passwordAlert" class="password-alert alert-danger"></div>
+                </div>
+                <button type="submit" id="signupButton" class="btn btn-primary" disabled>Signup</button>
+                <p>Already have an account? <a href="#" onclick="showLoginForm()">Login</a></p>
+            </form>
+        </div>
+        
+        <!-- JavaScript Files -->
+        <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script>
+            // JavaScript to toggle between login and signup forms
+            function showSignupForm() {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('signup-form').style.display = 'block';
+                window.location.hash = '#signup-form';
+            }
+
+            function showLoginForm() {
+                document.getElementById('signup-form').style.display = 'none';
+                document.getElementById('login-form').style.display = 'block';
+                window.location.hash = '#login-form';
+            }
+
+            // Trigger OTP request on 'Get OTP' button click
+            document.getElementById('getOtpButton').addEventListener('click', function() {
+                var email = document.getElementById('signupEmail').value;
+
+                if (!email) {
+                    alert('Please enter your email');
+                    return;
+                }
+
+                fetch("{{ url_for('customer_bp.send_otp_route') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'OTP sent successfully') {
+                        document.getElementById('otpSection').style.display = 'block';
+                        document.getElementById('resendOtp').style.display = 'inline';
+                        alert('OTP sent to your email.');
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+
+            // Verify OTP on 'Verify OTP' button click
+            document.getElementById('verifyOtpButton').addEventListener('click', function() {
+                var email = document.getElementById('signupEmail').value;
+                var otp = document.getElementById('otpInput').value;
+
+                fetch("{{ url_for('customer_bp.verify_otp_route') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email, otp: otp })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'OTP verified') {
+                        document.getElementById('signupButton').disabled = false;
+                        alert('OTP verified successfully.');
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+
+            // Check password requirements
+            document.getElementById('signupPassword').addEventListener('input', function() {
+                var password = this.value;
+                var passwordAlert = document.getElementById('passwordAlert');
+                var hasUpperCase = /[A-Z]/.test(password);
+                var hasNumber = /[0-9]/.test(password);
+                var hasSpecialChar = /[!@#$%^&*]/.test(password);
+                var minLength = password.length >= 8;
+
+                var requirements = [
+                    { test: hasUpperCase, message: 'Include at least one uppercase letter.' },
+                    { test: hasNumber, message: 'Include at least one number.' },
+                    { test: hasSpecialChar, message: 'Include at least one special character.' },
+                    { test: minLength, message: 'Password must be at least 8 characters long.' }
+                ];
+
+                var unmetRequirements = requirements.filter(req => !req.test).map(req => req.message);
+
+                if (unmetRequirements.length > 0) {
+                    passwordAlert.innerHTML = unmetRequirements.join('<br>');
+                    passwordAlert.style.display = 'block';
+                } else {
+                    passwordAlert.style.display = 'none';
+                }
+
+                // Enable/Disable the signup button based on password validity
+                document.getElementById('signupButton').disabled = unmetRequirements.length > 0;
+            });
+
+            // Handle password strength feedback
+            var passwordField = document.getElementById('signupPassword');
+            passwordField.addEventListener('focus', function() {
+                document.getElementById('passwordAlert').style.display = 'block';
+            });
+
+            passwordField.addEventListener('blur', function() {
+                document.getElementById('passwordAlert').style.display = 'none';
+            });
+        </script>
+    </div>
+</body>
+</html>

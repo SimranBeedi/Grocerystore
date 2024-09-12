@@ -1,0 +1,442 @@
+{% include 'navbar.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Products</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: #fff;
+            padding: 20px 0;
+            border-bottom: 2px solid #eee;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            position: fixed;
+            top: 90px; /* Adjust as needed */
+            left: 0;
+            z-index: 1000; /* Ensure it is above other elements */
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            margin-left: 300px;
+            padding: 0 20px;
+        }
+
+        .header-container h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #333;
+        }
+
+        .header-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 15px;
+        }
+
+        .header-links a {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header-links a:hover,
+        .header-links a.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            flex: 1;
+            margin: 60px auto;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 95px; /* Adjust according to header height */
+            width: 270px;
+            height: calc(100vh - 80px); /* Adjust according to header height */
+            background-color: #fff;
+            padding: 20px;
+            border-right: 2px solid #eee;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 16px;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 60px;
+            margin-left: 330px; /* Adjust according to sidebar width */
+            padding: 20px;
+            flex: 1;
+        }
+
+        /* Product Section */
+        .product-section {
+            margin-top: 20px;
+            margin-left: -200px;
+        }
+
+        #products-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .product-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+
+        .cart-icon {
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+        }
+
+        .product-item:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .product-item img {
+            width: 100%;
+            height: 200px; /* Set a fixed height */
+            object-fit: cover; /* Ensure the image covers the container while preserving its aspect ratio */
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        .product-item h4 {
+            font-size: 20px;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .product-item p {
+            font-size: 16px;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .product-item a {
+            display: inline-block;
+            text-decoration: none;
+            color: #007bff;
+            font-size: 16px;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        .product-item a:hover {
+            color: #0056b3;
+        }
+
+        .add-to-cart {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background-color: #218838;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+            margin-top: auto;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 190px; /* Adjust according to sidebar width */
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            #products-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            #products-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 2px solid #eee;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            footer {
+                left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #products-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <ul class="header-links">
+                {% for category in core_categories %}
+                    <li><a href="#" data-category-id="{{ category.id }}">{{ category.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="filters">
+                <h2>Sub Categories</h2>
+                <ul class="subcategory-buttons">
+                    <!-- Subcategory buttons will be filled dynamically -->
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="product-section">
+                <div id="products-list">
+                    <!-- Product items will be dynamically updated here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Your Company. All rights reserved.</p>
+    </footer>
+<script>
+    function updateProducts(coreCategoryId = '', subcategoryId = '') {
+        const params = new URLSearchParams({
+            core_category_id: coreCategoryId,
+            subcategory_id: subcategoryId
+        });
+
+        fetch('/customer/get_products?' + params.toString())
+            .then(response => response.json())
+            .then(data => {
+                const productsList = document.getElementById('products-list');
+                productsList.innerHTML = '';
+                if (data.products.length === 0) {
+                    productsList.innerHTML = '<p>No products found for the selected filters.</p>';
+                } else {
+                    data.products.forEach(product => {
+                        const productDiv = document.createElement('div');
+                        productDiv.classList.add('product-item');
+                        productDiv.innerHTML = `
+                            <img src="/static/products/images/${product.image}" alt="${product.name}">
+                            <h4>${product.name}</h4>
+                            <p>${product.discounted_price}</p>
+                            <p>${product.description}</p><hr>
+                            <button class="add-to-cart" data-product-id="${product.id}">ADD</button>
+                            <i id="wishlist-icon-${product.id}" class="fas fa-heart wishlist-icon" data-product-id="${product.id}" onclick="toggleWishlist(${product.id}, this)"></i>
+                        `;
+                        productsList.appendChild(productDiv);
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching products:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const coreCategoryLinks = document.querySelectorAll('.header-links a');
+        const subcategoryButtonsContainer = document.querySelector('.subcategory-buttons');
+
+        const defaultCoreCategoryId = coreCategoryLinks[0]?.getAttribute('data-category-id') || '';
+        updateProducts(defaultCoreCategoryId);
+
+        coreCategoryLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                coreCategoryLinks.forEach(link => link.classList.remove('active'));
+                this.classList.add('active');
+
+                const coreCategoryId = this.getAttribute('data-category-id');
+                if (coreCategoryId) {
+                    fetch(`/customer/get_filters?core_category_id=${coreCategoryId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            subcategoryButtonsContainer.innerHTML = '';
+                            data.subcategories.forEach(subcat => {
+                                const subcatButton = document.createElement('li');
+                                subcatButton.innerHTML = `
+                                    <a href="#" data-subcategory-id="${subcat.id}">${subcat.name}</a>
+                                `;
+                                subcategoryButtonsContainer.appendChild(subcatButton);
+                            });
+                        })
+                        .catch(error => console.error('Error fetching subcategories:', error));
+
+                    updateProducts(coreCategoryId);
+                }
+            });
+        });
+
+        subcategoryButtonsContainer.addEventListener('click', function(event) {
+            if (event.target.tagName === 'A') {
+                event.preventDefault();
+                const subcategoryId = event.target.getAttribute('data-subcategory-id');
+                if (subcategoryId) {
+                    updateProducts('', subcategoryId);
+                }
+            }
+        });
+
+        // Handle "Add to Cart" button clicks
+        document.getElementById('products-list').addEventListener('click', function(event) {
+            if (event.target.classList.contains('add-to-cart')) {
+                event.preventDefault();
+                const productId = event.target.getAttribute('data-product-id');
+                if (productId) {
+                    fetch('/customer/add_to_cart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            'product_id': productId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Product added to cart!');
+                            document.querySelector('.cart-badge').textContent = data.cart_count; // Update cart count
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error adding to cart:', error));
+                }
+            }
+        });
+    });
+
+    function toggleWishlist(productId, iconElement) {
+        fetch('/customer/toggle_wishlist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                'product_id': productId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                iconElement.classList.toggle('text-danger');
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error toggling wishlist:', error));
+    }
+</script>
+
+</body>
+</html>

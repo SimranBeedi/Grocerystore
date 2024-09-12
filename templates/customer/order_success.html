@@ -1,0 +1,147 @@
+
+{% include 'navbar.html' %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success</title>
+    <!-- Include local CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
+    <style>
+        /* Inline styles for simplicity */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 130px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+        }
+        .order-summary, .order-items {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .order-summary h2, .order-items h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .order-items table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .order-items th, .order-items td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .order-items th {
+            background-color: #f4f4f4;
+        }
+        .order-items img {
+            max-width: 100px;
+            height: auto;
+            border-radius: 4px;
+        }
+        .a1 {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            color: #fff;
+            background-color: #4CAF50;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .a1:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Success</h1>
+
+        <!-- Order Summary Section -->
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            {% if order_details %}
+                <p><strong>Order ID:</strong> {{ order_details[0].id }}</p>
+                <p><strong>Date:</strong> {{ order_details[0].created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                <p><strong>Status:</strong> {{ order_details[0].status }}</p>
+                <p><strong>Total Amount:</strong> ₹{{ order_details[0].order_amount }}</p>
+                <p><strong>Order Description:</strong> {{ order_details[0].order_description if order_details[0].order_description else 'None' }}</p>
+            {% else %}
+                <p>No order details found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Order Items Section -->
+        <div class="order-items">
+            <h2>Order Items</h2>
+            {% if order_details %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Description</th>
+                            <th>Brand</th>
+                            <th>Shop Name</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set total_amount = 0 %}
+                        {% for detail in order_details %}
+                            {% set line_total = detail['selling_price'] * detail['quantity'] %}
+                            {% set total_amount = total_amount + line_total %}
+                            <tr>
+                                <td>{{ detail['product_name'] }}</td>
+                                <td>{{ detail['product_description'] }}</td>
+                                <td>{{ detail['brand_name'] }}</td>
+                                <td>{{ detail['shop_name'] }}</td>
+                                <td>₹{{ detail['selling_price'] }}</td>
+                                <td>{{ detail['quantity'] }}</td>
+                                <td>₹{{ line_total }}</td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td colspan="6"><strong>Order Total:</strong></td>
+                            <td>₹{{ order_details[0].order_amount }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No order items found.</p>
+            {% endif %}
+        </div>
+
+        <a href="/" class="a1">Return to Home</a>
+    </div>
+    <!-- Include local footer -->
+    {% include 'custome_footer.html' %}
+    
+    <!-- Include local JavaScript -->
+    <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+</body>
+</html>

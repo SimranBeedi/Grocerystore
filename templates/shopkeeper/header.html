@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopkeeper Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <style>
+        .navbar {
+            background-color: #343a40; /* Dark background for the navbar */
+        }
+        .navbar-brand {
+            color: #ffffff; /* White text color for brand */
+            font-weight: bold;
+        }
+        .navbar-nav .nav-link {
+            color: #ffffff; /* White text color for nav links */
+        }
+        .navbar-nav .nav-link:hover {
+            color: #dddddd; /* Slightly lighter color on hover */
+        }
+        .navbar .navbar-text {
+            color: #ffffff; /* White text color for navbar text */
+        }
+        .user-area {
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 30px; /* Smaller avatar */
+            height: 30px;
+            border-radius: 50%; /* Makes the avatar circular */
+            object-fit: cover;
+            margin-right: 10px;
+            cursor: pointer; /* Indicate clickable */
+        }
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: #fff;
+            border-radius: 7px;
+            box-shadow: 0px 0px 8px rgba(214, 214, 214, 0.78);
+            list-style: none;
+            padding: 0;
+            width: 150px;
+            z-index: 1000;
+        }
+        .user-dropdown.open {
+            display: block;
+        }
+        .user-dropdown li {
+            border-bottom: 1px solid rgba(215, 215, 215, 0.17);
+        }
+        .user-dropdown li:last-child {
+            border-bottom: 0;
+        }
+        .user-dropdown a {
+            display: block;
+            padding: 10px;
+            color: #1787e0;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .user-dropdown a:hover {
+            background: #f1f1f1;
+        }
+        .modal-dialog {
+            max-width: 50%; /* Adjust as needed */
+        }
+        .modal-body img {
+            width: 100%; /* Make the image fit the modal */
+            height: auto; /* Maintain aspect ratio */
+        }
+        .dropdown-arrow {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 6px solid #ffffff; /* Color of the arrow */
+            margin-left: 5px; /* Space between text and arrow */
+        }
+        
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <a class="navbar-brand" href="#">Shopkeeper Dashboard</a>
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    {% if 'shopkeeper_logged_in' in session %}
+                        <span class="navbar-text mr-3">Welcome, {{ session['username'] }}!</span>
+                        <img src="{{ url_for('static', filename='images/' ~ image_filename) }}" alt="Profile Image" class="user-avatar" data-toggle="modal" data-target="#imageModal">
+                    {% endif %}
+                </li>
+                {% if 'shopkeeper_logged_in' in session %}
+                    <li class="nav-item">
+                        <div class="user-area">
+                            <span class="navbar-text">Account info <span class="dropdown-arrow"></span></span>
+                            <ul class="user-dropdown" id="userDropdown">
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#profileModal">Profile</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ url_for('shopkeeper_bp.logout_shopkeeper') }}">Logout</a>
+                            </ul>
+                        </div>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">Profile Image</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img src="{{ url_for('static', filename='images/' ~ image_filename) }}" alt="Profile Image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Profile Update Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileModalLabel">Update Profile</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="{{ url_for('shopkeeper_bp.update_profile') }}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <!-- Display current profile image -->
+                    <div class="form-group">
+                        <label for="profile_image">Profile Image</label>
+                        <div class="mb-2">
+                            <img src="{{ url_for('static', filename='images/' ~ image_filename) }}" alt="Current Profile Image" class="img-thumbnail" style="max-width: 150px;">
+                        </div>
+                        <input type="file" class="form-control-file" id="profile_image" name="profile_image">
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ session['username'] }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">New Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank to keep current password">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+    <div class="container mt-5">
+        {% block content %}
+        <!-- Main content of child templates will be inserted here -->
+        {% endblock %}
+    </div>
+
+    <!-- Bootstrap and jQuery JS --><!-- Bootstrap JS and dependencies -->
+<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script>
+        document.querySelector('.user-area').addEventListener('click', function() {
+            document.getElementById('userDropdown').classList.toggle('open');
+        });
+    </script>
+</body>
+</html>

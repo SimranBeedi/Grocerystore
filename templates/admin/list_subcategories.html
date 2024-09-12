@@ -1,0 +1,184 @@
+{% extends "admin/admin_dashboard.html" %}
+
+{% block content %}
+<div class="card">
+    <h3>List of Subcategories</h3>
+    <button id="openAddSubcategoryModalBtn" class="btn btn-primary mb-3">Add Subcategory</button>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Core Category</th>
+                    <th>Image</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subcategory in subcategories %}
+                <tr>
+                    <td>{{ subcategory[0] }}</td>
+                    <td>{{ subcategory[1] }}</td>
+                    <td>{{ subcategory[2] }}</td>
+                    <td>{{ subcategory[3] }}</td>
+                    <td>
+                        {% if subcategory[4] %}
+                            <img src="{{ url_for('static', filename='sub_category/' + subcategory[4]) }}" alt="Subcategory Image" style="max-width: 100px; max-height: 100px;">
+                        {% else %}
+                            No Image
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-info edit-subcategory" 
+                           data-id="{{ subcategory[0] }}" 
+                           data-name="{{ subcategory[1] }}" 
+                           data-description="{{ subcategory[2] }}" 
+                           data-core-category="{{ subcategory[3] }}" 
+                           data-image="{{ subcategory[4] }}" 
+                           data-toggle="modal" 
+                           data-target="#editSubcategoryModal">Edit</a>
+                        <a href="{{ url_for('category_bp.delete_subcategory', id=subcategory[0]) }}" 
+                           class="btn btn-sm btn-danger" 
+                           onclick="return confirm('Are you sure you want to delete this subcategory?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal for adding subcategory -->
+<div id="addSubcategoryModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Subcategory</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addSubcategoryForm" action="{{ url_for('category_bp.add_subcategory') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="core_category">Core Category:</label>
+                        <select class="form-control" id="core_category" name="core_category_id" required>
+                            {% for core_category in core_categories %}
+                                <option value="{{ core_category[0] }}">{{ core_category[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Image:</label>
+                        <input type="file" class="form-control-file" id="image" name="image">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" form="addSubcategoryForm" class="btn btn-primary">Add Subcategory</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for editing subcategory -->
+<div id="editSubcategoryModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Subcategory</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editSubcategoryForm" action="{{ url_for('category_bp.edit_subcategory', id=0) }}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" id="editSubcategoryId" name="id">
+                    <div class="form-group">
+                        <label for="editSubcategoryName">Name:</label>
+                        <input type="text" class="form-control" id="editSubcategoryName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editSubcategoryDescription">Description:</label>
+                        <textarea class="form-control" id="editSubcategoryDescription" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editSubcategoryCoreCategory">Core Category:</label>
+                        <select class="form-control" id="editSubcategoryCoreCategory" name="core_category_id" required>
+                            {% for core_category in core_categories %}
+                                <option value="{{ core_category[0] }}">{{ core_category[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editSubcategoryImage">Image:</label>
+                        <input type="file" class="form-control-file" id="editSubcategoryImage" name="image">
+                        <img id="editSubcategoryCurrentImage" src="#" alt="Current Image" style="max-width: 100px; max-height: 100px; display: none;">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" form="editSubcategoryForm" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery, Popper.js, Bootstrap JS -->
+<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+<script>
+    $(document).ready(function(){
+        // Get the modal
+        var addModal = $('#addSubcategoryModal');
+        var editModal = $('#editSubcategoryModal');
+
+        // Open the add modal
+        $('#openAddSubcategoryModalBtn').click(function() {
+            addModal.modal('show');
+        });
+
+        // Close the add modal
+        addModal.find(".close").click(function() {
+            addModal.modal('hide');
+        });
+
+        // Close the edit modal
+        editModal.find(".close").click(function() {
+            editModal.modal('hide');
+        });
+
+        // Populate edit modal with data
+        $('.edit-subcategory').click(function() {
+            var id = $(this).data('id');
+            var name = $(this).data('name');
+            var description = $(this).data('description');
+            var coreCategory = $(this).data('core-category');
+            var image = $(this).data('image');
+
+            $('#editSubcategoryId').val(id);
+            $('#editSubcategoryName').val(name);
+            $('#editSubcategoryDescription').val(description);
+            $('#editSubcategoryCoreCategory').val(coreCategory);
+            if (image) {
+                $('#editSubcategoryCurrentImage').attr('src', '{{ url_for('static', filename='sub_category/') }}' + image).show();
+            } else {
+                $('#editSubcategoryCurrentImage').hide();
+            }
+
+            editModal.modal('show');
+        });
+    });
+</script>
+{% endblock %}

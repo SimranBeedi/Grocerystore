@@ -1,0 +1,209 @@
+{% include 'navbar.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <!-- Use local Bootstrap CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Use local jQuery and Bootstrap JS -->
+    <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <!-- Stripe's JS library must be loaded from the internet -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+       body {
+    background-color: #f8f9fa; /* Slightly lighter background color for a modern look */
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 30px;
+    margin-top: 100px; /* Adjusted for better spacing */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto; /* Center the container horizontally */
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 2.5rem;
+    text-align: center;
+}
+
+h3 {
+    margin-top: 20px;
+    margin-bottom: 15px;
+    color: #555;
+    font-size: 1.5rem;
+}
+
+.alert {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 30px;
+}
+
+ul li {
+    padding: 15px 0;
+    border-bottom: 1px solid #ddd;
+    font-size: 1rem;
+    color: #333;
+}
+
+ul li:last-child {
+    border-bottom: none;
+}
+
+p {
+    margin: 15px 0;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 5px;
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s, border-color 0.3s;
+    text-transform: uppercase; /* Make button text uppercase */
+    font-weight: bold; /* Make button text bold */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+#card-element {
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 20px;
+    background: #ffffff;
+    margin-bottom: 15px;
+}
+
+#card-errors {
+    color: #dc3545;
+    margin-top: 10px;
+    font-size: 0.875rem;
+}
+
+    </style>
+</head><body>
+    <body>
+        <div class="container">
+            <h1 class="text-center">Checkout</h1>
+    
+            <!-- Flashed Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+    
+            <h3>Cart Summary:</h3>
+            <ul>
+                {% for item in cart_items %}
+                    <li>
+                        {{ item.name }} - {{ item.quantity }} x ₹{{ item.discounted_price }}<br>
+                        Shop: {{ item.shop_name }}
+                    </li>
+                {% endfor %}
+            </ul>
+            <p>Subtotal: ₹{{ subtotal }}</p>
+            <p>Shipping: ₹{{ shipping }}</p>
+            <p><strong>Total: ₹{{ total }}</strong></p>
+    
+            <form id="payment-form" method="POST" action="{{ url_for('customer_bp.process_payment') }}">
+                <div class="form-group">
+                    <label for="card-element">Credit or debit card</label>
+                    <div id="card-element"></div>
+                    <div id="card-errors" role="alert"></div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Payment</button>
+            </form>
+        </div>
+    
+        <script>
+            var stripe = Stripe('pk_test_51Pksa1BQaGAcoXBgngf65cmDDLNaplPUXyWDqUOZ08LDYTnOirPR6klFGc7NKZHYj7uQvBjDjYxUTv9Ui9BbA18H006Oel2t0C');
+            var elements = stripe.elements();
+    
+            var card = elements.create('card');
+            card.mount('#card-element');
+    
+            var form = document.getElementById('payment-form');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+    
+                stripe.createToken(card).then(function(result) {
+                    if (result.error) {
+                        // Display error in #card-errors
+                        var errorElement = document.getElementById('card-errors');
+                        errorElement.textContent = result.error.message;
+                    } else {
+                        // Send token to your server
+                        var form = document.getElementById('payment-form');
+                        var hiddenInput = document.createElement('input');
+                        hiddenInput.setAttribute('type', 'hidden');
+                        hiddenInput.setAttribute('name', 'stripeToken');
+                        hiddenInput.setAttribute('value', result.token.id);
+                        form.appendChild(hiddenInput);
+    
+                        // Add hidden inputs for amount and other details
+                        var amountInput = document.createElement('input');
+                        amountInput.setAttribute('type', 'hidden');
+                        amountInput.setAttribute('name', 'amount');
+                        amountInput.setAttribute('value', '{{ total * 100 | int }}');  // Ensure it's an integer in cents
+                        form.appendChild(amountInput);
+    
+                        // Log form data to ensure it's correct
+                        console.log('Form Data:', {
+                            stripeToken: result.token.id,
+                            amount: '{{ total * 100 }}'
+                        });
+    
+                        form.submit();
+                    }
+                });
+            });
+        </script>
+    </body>
+    </html>

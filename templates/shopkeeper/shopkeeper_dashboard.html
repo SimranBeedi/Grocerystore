@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopkeeper Dashboard</title>
+    <!-- Local Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <!-- Custom CSS -->
+    <style>
+        /* Custom styles for a professional look */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+        .navbar-brand, .navbar-nav .nav-link {
+            color: #fff;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background-color: #343a40;
+            color: #fff;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            color: #adb5bd;
+            font-weight: 500;
+        }
+
+        .sidebar a:hover {
+            color: #fff;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            padding: 20px;
+        }
+
+        .card h3, .card h1, .card h2 {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            margin-bottom: 20px;
+        }
+
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .card-deck .card {
+            margin-bottom: 20px;
+        }
+
+        /* Grocery Card Styles */
+        .card.grocery {
+            background: linear-gradient(145deg, #f5f5f5, #e1e1e1);
+            border-left: 5px solid #28a745; /* Green border */
+        }
+
+        .card.grocery .card-body {
+            color: #495057;
+        }
+
+        /* Brand Card Styles */
+        .card.brand {
+            background: linear-gradient(145deg, #fff6f6, #ffe0e0);
+            border-left: 5px solid #dc3545; /* Red border */
+        }
+
+        .card.brand .card-body {
+            color: #6c757d;
+        }
+
+        /* Order Card Styles */
+        .card.order {
+            background: linear-gradient(145deg, #e2e3e5, #d3d6d9);
+            border-left: 5px solid #007bff; /* Blue border */
+        }
+
+        .card.order .card-body {
+            color: #343a40;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    {% include 'shopkeeper/header.html' %}
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="container mt-4">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar">
+                {% include 'shopkeeper/sidebar.html' %}
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ml-sm-auto col-lg-10 main-content">
+                <div id="dashboard-content">
+                    {% block content %}
+                    <div class="card">
+                        <h3 class="text-secondary">Dashboard Overview</h3>
+                        <h1 class="text-primary">Welcome, {{ username }}</h1>
+                        <h2 class="text-muted">Shop Name: {{ shop_name }}</h2>
+                    </div>
+                    
+                    <div class="card-deck">
+                        <div class="card grocery">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Groceries</h5>
+                                <h1 class="card-text">{{ grocery_count }}</h1>
+                            </div>
+                        </div>
+                        <div class="card brand">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Brands</h5>
+                                <h1 class="card-text">{{ brand_count }}</h1>
+                            </div>
+                        </div>
+                        <div class="card order">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Orders</h5>
+                                <h1 class="card-text">{{ order_count }}</h1>
+                            </div>
+                        </div>
+                    </div>
+                    {% endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    {% include 'shopkeeper/footer.html' %}
+
+    <!-- Local Bootstrap JS and dependencies -->
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+</body>
+</html>

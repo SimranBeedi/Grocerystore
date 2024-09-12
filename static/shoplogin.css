@@ -1,0 +1,59 @@
+/* Centering the form */
+.centered-form {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px; /* Adjust width as needed */
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Additional styles for content inside the form */
+.centered-form h2 {
+    margin-top: 0;
+    font-size: 24px;
+    text-align: center;
+    color: #333;
+}
+
+.centered-form form {
+    margin-top: 20px;
+}
+
+.centered-form .form-group {
+    margin-bottom: 15px;
+}
+
+.centered-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+.centered-form input[type="text"],
+.centered-form input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.centered-form button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.centered-form button[type="submit"]:hover {
+    background-color: #0056b3;
+}

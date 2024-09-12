@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallax Effect Example</title>
+    <!-- Reference local jQuery file -->
+    <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Montserrat", sans-serif;
+            background-color: white;
+        }
+
+        .sample-header {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            background: url('{{ url_for('static', filename='login/home.jpg') }}'); /* Use local image path */
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sample-header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: MidnightBlue;
+            opacity: 0.3;
+        }
+
+        .sample-header-section {
+            position: relative;
+            padding: 10% 0 10%;
+            max-width: 640px;
+            margin: auto;
+            color: white;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .h1head {
+            font-weight: 500;
+            color: white;
+        }
+
+        .h2head {
+            font-weight: 400;
+            color: white;
+        }
+
+        .sample-section-wrap {
+            position: relative;
+            background-color: white;
+            margin-top: 50vh;
+        }
+
+        .sample-section {
+            max-width: 940px;
+            margin: auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .parallax {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .parallax-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            will-change: transform;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="sample-header">
+    <div class="sample-header-section">
+        <h1 class="h1head">Buy Direct</h1>
+        <h2 class="h2head">Save While You Shop</h2>
+    </div>
+</div>
+
+<div class="parallax parallax-image image1"></div>
+<div class="parallax parallax-image image2"></div>
+<div class="parallax parallax-image image3"></div>
+
+<div class="sample-section-wrap">
+    <div class="sample-section">
+        <h2>About</h2>
+        <p>Buy Direct is a digital platform revolutionizing local commerce by empowering small businesses and communities. It helps local shops thrive in the competitive digital landscape dominated by larger online stores.</p>
+        <p>Shopkeepers can easily register, add products, and expand their customer base through an intuitive interface. Customers benefit from a seamless shopping experience, browsing and purchasing products conveniently from local stores using their phones or computers.</p>
+    </div>
+</div>
+
+<script>
+    function parallax_height() {
+        var scroll_top = $(this).scrollTop();
+        var header_height = $(".sample-header-section").outerHeight();
+        $(".sample-section").css({ "margin-top": header_height });
+        $(".sample-header").css({ height: header_height - scroll_top });
+
+        $('.parallax-image').each(function() {
+            var offset = $(this).offset().top;
+            var yPos = (scroll_top - offset) * 0.5;
+            $(this).css('transform', 'translateY(' + yPos + 'px)');
+        });
+    }
+
+    $(window).on('scroll resize', parallax_height);
+    parallax_height(); // Initial call
+</script>
+
+</body>
+</html>

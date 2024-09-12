@@ -1,0 +1,323 @@
+
+{% include 'navbar.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Search Results</title>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <!-- Local FontAwesome -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
+
+    <!-- Inline CSS specific to this page -->
+    <style>
+        .container {
+            margin-top: 40px;
+            width: 90%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-top: 90px;
+            padding-bottom: 50px;
+        }
+
+        .product-nav {
+            width: 100%;
+            color: #000000;
+            text-transform: uppercase;
+            padding: 20px;
+            border-bottom: 2px solid #efefef;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-nav-left {
+            flex: 1;
+        }
+
+        .product-nav nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .arrow {
+            height: 15px;
+            width: 15px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .heart-icon {
+            height: 24px;
+            width: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .heart-icon:hover {
+            color: red;
+        }
+
+        .product-card {
+            display: flex;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.16), 0 2px 10px rgba(0,0,0,0.12);
+            transition: all 0.3s;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #ffffff;
+            margin-top: 20px;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 8px 17px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.19);
+        }
+
+        .product-photo {
+            width: 40%; /* Adjusted width to fit the image on the left */
+            text-align: center;
+            padding: 20px;
+        }
+
+        .product-photo img {
+            max-height: 240px;
+            width: auto;
+            margin-top: 100px;
+            max-width: 100%; /* Ensure image fits within its container */
+            border-radius: 10px;
+        }
+
+        .product-description {
+            width: 60%; /* Adjusted width to fit the details on the right */
+            padding: 20px;
+            border-left: 2px solid #efefef;
+        }
+
+        .product-description h2 {
+            color: #000000;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            font-weight: 900;
+            font-size: 26px;
+        }
+
+        .product-description h4 {
+            margin: 0;
+            color: #000000;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .product-description h1 {
+            color: #e74c3c;
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .product-price-info {
+            font-size: 18px;
+            color: #000000;
+            margin: 10px 0;
+        }
+
+        .product-price-info .cost-price {
+            text-decoration: line-through;
+            color: #777;
+            margin-right: 10px;
+        }
+
+        .product-price-info .selling-price {
+            color: #e74c3c;
+        }
+
+        .product-description p {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #000000;
+            margin: 15px 0;
+        }
+
+        .product-description button {
+            outline: none;
+            border: 1px solid #554100;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            color: #515151;
+            text-transform: uppercase;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            background: #ffffff;
+            margin-right: 10px;
+        }
+
+        .product-description button:hover {
+            background: #f0f0f0;
+            border-color: #8d7b12;
+            color: #000000;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .quantity-button {
+            background-color: #3498db;
+            color: #ffffff;
+            border: none;
+            padding: 8px 12px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+
+        .quantity-button:hover {
+            background-color: #2980b9;
+        }
+
+        #quantity {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ddd;
+            padding: 5px;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+
+        .add-to-cart {
+            background-color: #2ecc71;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .add-to-cart:hover {
+            background-color: #27ae60;
+        }
+
+        .wishlist-icon {
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .wishlist-icon.text-danger {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+
+{% block content %}
+<div class="container">
+    <div class="product-nav">
+        <nav>
+            <a href="{{ url_for('home') }}">
+                <svg class="arrow" version="1.1" viewBox="0 0 512 512" width="15px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <polygon points="352,115.4 331.3,96 160,256 331.3,416 352,396.7 201.5,256" stroke="#000000"/>
+                </svg>
+                <div class="product-nav-left">Back to Home</div>
+            </a>
+        </nav>
+    </div>
+
+    <h4>Search Results for "{{ query }}"</h4>
+    
+    <div class="product-list">
+        {% if products %}
+            {% for product in products %}
+                <div class="product-card">
+                    <div class="product-photo">
+                        <img src="{{ url_for('static', filename='products/images/' ~ product[4]) }}" alt="{{ product[1] }} Image" class="mb-3">
+                    </div>
+                    <div class="product-description">
+                        <h2>{{ product[1] }}</h2>
+                        <p><strong>Description:</strong> {{ product[2] }}</p>
+                        <p><strong>Category:</strong> {{ product[8] }}</p>
+                        <p><strong>Brand:</strong> {{ product[9] }}</p>
+                        <p><strong>Shopkeeper:</strong> {{ product[10] }}</p>
+                        <p><strong>Selling Price:</strong> ${{ product[3] }}</p>
+                        <p><strong>Cost Price:</strong> ${{ product[5] }}</p>
+                        <p><strong>Quantity:</strong> {{ product[6] }}</p>
+                        <form id="add-to-cart-form-{{ product[0] }}" action="{{ url_for('customer_bp.add_to_cart') }}" method="POST">
+                            <input type="hidden" name="product_id" value="{{ product[0] }}">
+                            <button type="button" class="btn btn-primary mb-2 add-to-cart-btn" onclick="addToCart({{ product[0] }})">Add to Cart</button>
+                        </form>
+                        <i id="wishlist-icon-{{ product[0] }}" class="fas fa-heart wishlist-icon {% if product[0] in wishlist %}text-danger{% endif %}" onclick="toggleWishlist({{ product[0] }})"></i>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No products found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script>
+    function addToCart(productId) {
+        $.ajax({
+            type: "POST",
+            url: "{{ url_for('customer_bp.add_to_cart') }}",
+            data: { product_id: productId },
+            success: function(response) {
+                alert('Product added to cart!');
+            },
+            error: function() {
+                alert('Failed to add product to cart.');
+            }
+        });
+    }
+
+    function toggleWishlist(productId) {
+    const formData = new FormData();
+    formData.append('product_id', productId);
+
+    fetch('/customer/wishlist/toggle', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Server response:', data); // Debugging line
+        if (data.success) {
+            const icon = document.querySelector(`#wishlist-icon-${productId}`);
+            if (data.wishlisted) {
+                icon.classList.add('text-danger'); // Add red color
+                alert('Product added to wishlist.');
+            } else {
+                icon.classList.remove('text-danger'); // Remove red color
+                alert('Product removed from wishlist.');
+            }
+        } else {
+            alert(data.message || 'Failed to toggle wishlist.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An unexpected error occurred. Please try again later.');
+    });
+}
+</script>
+{% endblock %}
+
+</body>
+</html>

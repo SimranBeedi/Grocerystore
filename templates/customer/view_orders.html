@@ -1,0 +1,153 @@
+{% include 'navbar.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 100px;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #000000;
+        }
+
+        .status-filter {
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .status-filter a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #646464;
+            border: 2px solid #747474;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .status-filter a:hover,
+        .status-filter a.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #1e2022;
+            color: #fff;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        caption {
+            caption-side: top;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            
+            th {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            
+            tr {
+                border: 1px solid #ddd;
+                margin-bottom: 10px;
+            }
+            
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+            
+            td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 45%;
+                padding-left: 10px;
+                font-weight: bold;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>My Orders</h1>
+
+    <!-- Status Filter -->
+
+    <!-- Delivery Status Filter -->
+    <div class="status-filter">
+        <a href="{{ url_for('customer_bp.view_orders', delivery_status='') }}" class="{{ request.args.get('delivery_status') == '' and 'active' }}">All Items</a>
+        <a href="{{ url_for('customer_bp.view_orders', delivery_status='Delivered') }}" class="{{ request.args.get('delivery_status') == 'Delivered' and 'active' }}">Delivered</a>
+        <a href="{{ url_for('customer_bp.view_orders', delivery_status='Pending') }}" class="{{ request.args.get('delivery_status') == 'Pending' and 'active' }}">Pending</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Items</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td data-label="Order ID">{{ order.id }}</td>
+                    <td data-label="Amount">${{ order.amount }}</td>
+                    <td data-label="Description">{{ order.description }}</td>
+                    <td data-label="Status">{{ order.status }}</td>
+                    <td data-label="Date">{{ order.created_at }}</td>
+                    <td data-label="Items">
+                        <ul>
+                            {% for item in order_items[order.id] %}
+                                <li>
+                                    {{ item.product_name }} ({{ item.quantity }} @ ${{ item.selling_price }} each) - Delivery Status: {{ item.delivery_status }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

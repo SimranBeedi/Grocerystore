@@ -1,0 +1,39 @@
+body {
+    position: relative;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    margin-top: 30px;
+    z-index: 100; /* Ensure the sidebar is above other content */
+    padding-top: 60px; /* Adjust according to your header height */
+    overflow-y: auto; /* Enable scrolling if content exceeds sidebar height */
+    background-color: #000; /* Black background color */
+    width: 400px; /* Adjust the width as needed */
+}
+
+main {
+    margin-left: 200px; /* Ensure content does not overlap with sidebar */
+    /* Adjust margin-left to match sidebar width */
+}
+
+header,
+footer {
+    position: relative; /* Ensure header and footer stay above sidebar */
+    z-index: 101; /* Ensure header and footer are above sidebar */
+}
+
+
+footer {
+    position: fixed; /* Fixed position to keep it at the bottom */
+    bottom: 0;
+    width: 100%;
+    background-color: #333;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px 0;
+    z-index: 101; /* Ensure it stays above sidebar */
+}

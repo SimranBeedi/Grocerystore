@@ -1,0 +1,388 @@
+{% include 'navbar.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Page Title</title>
+    <!-- Local Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <!-- Local Font Awesome CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
+    <!-- Local Custom CSS -->
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #7e5555;
+            color: #fff;
+            padding: 20px 0;
+            border-bottom: 2px solid #8a95fd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            margin-top: 59px;
+            z-index: 10;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            text-align: right;
+            max-width: 1200px;
+            margin-top: 40px;
+            padding: 0;
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+            margin-top: 20px;
+        }
+
+        .sidebar {
+    position: fixed;
+    left: 0;
+    top: 80px; /* Adjust this value based on your header height */
+    width: 300px;
+    height: calc(100vh - 80px); /* Adjust the height to fit the viewport minus header height */
+    background-color: #ffffff;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    z-index: 1;
+}
+
+        .sidebar h2 {
+            margin-top: 100px;
+            font-size: 20px;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar .category-btn {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 16px;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            border: 1px solid #007bff;
+            background-color: #fff;
+        }
+
+        .sidebar .category-btn:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .main-content {
+            margin-left: 270px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .product-section {
+            margin-top: 20px;
+        }
+
+        #products-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .product-card {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      background-color: #fff;
+      width: 225px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease-in-out;
+      height: 100%;
+    }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 15px;
+        }
+
+        .product-card h3 {
+            font-size: 18px;
+            color: #333;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        .product-card p {
+            font-size: 16px;
+            color: #555;
+            margin: 5px 0;
+        }
+
+
+/* Add to Cart Button */
+.product-card .add-to-cart {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.3s;
+    position: absolute; /* Position relative to the product card */
+    bottom: 20px; /* Distance from the bottom of the card */
+    left: 50%;
+    transform: translateX(-50%); /* Center the button horizontally */
+}
+
+        .product-card .add-to-cart:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+            margin-top: auto;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 200px;
+        }
+
+        @media (max-width: 1200px) {
+            #products-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            #products-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 2px solid #ddd;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #products-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    {% include 'navbar.html' %}
+    
+    <header>
+        <div class="header-container">
+            <h1>{{ shop[0] }}</h1>
+        </div>
+    </header>
+
+    <!-- Flash messages -->
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main>
+        <section class="container d-flex">
+            <aside class="sidebar">
+                <h2>Filter Products</h2>
+                <form id="filter-form">
+                    <div id="category-buttons" class="d-flex flex-wrap">
+                        {% for category in core_categories %}
+                            <button type="button" class="btn category-btn m-1" data-category-id="{{ category[0] }}" onclick="filterProducts({{ category[0] }})">
+                                {{ category[1] }}
+                            </button>
+                        {% endfor %}
+                    </div>
+                </form>
+            </aside>
+
+            <div class="main-content flex-grow-1">
+                <section class="product-section">
+                    <h2>Products</h2>
+                    <div id="products-list">
+                        {% for product in groceries %}
+                        <div class="product-card">
+                            <img src="{{ url_for('static', filename='products/images/' ~ product[4]) }}" alt="{{ product[1] }}">
+                            <h3>{{ product[1] }}</h3>
+                            <p>{{ product[2] }}</p>
+                            <p><strong>Brand:</strong> {{ product[8] }}</p> <!-- Displaying the Brand -->
+                 <!-- Displaying the Cost Price -->
+                           <!-- Displaying the Selling Price -->
+                            <p><strong>Price:</strong> ₹{{ product[3] }}</p>
+
+                            <!-- Add to Cart Form -->
+                            <form id="add-to-cart-form-{{ product[0] }}" action="{{ url_for('customer_bp.add_to_cart') }}" method="POST">
+                                <input type="hidden" name="product_id" value="{{ product[0] }}">
+                                <hr><button type="submit" class="btn btn-primary mb-2 add-to-cart-btn" data-form-id="add-to-cart-form-{{ product[0] }}" onclick="addToCart({{ product[0] }}, event)">Add to Cart</button>
+                                <i id="wishlist-icon-{{ product[0] }}" class="fas fa-heart wishlist-icon {% if product[0] in wishlist %}text-danger{% endif %}" onclick="toggleWishlist({{ product[0] }})"></i>
+                            </form>
+
+                            <!-- Wishlist Icon -->
+                                  </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        &copy; 2024 Your Company Name
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+    <script>
+        // Add to Cart Functionality
+        function addToCart(productId, event) {
+            event.preventDefault();
+            const form = document.getElementById(`add-to-cart-form-${productId}`);
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('cart-count').textContent = data.cart_count;
+                    alert('Item added to cart successfully!');
+                } else {
+                    alert(data.message || 'Failed to add item to cart.');
+                }
+            })
+            .catch(error => {
+                alert('An unexpected error occurred. Please try again.');
+            });
+        }
+
+        // Wishlist Toggle
+
+        function toggleWishlist(productId) {
+    const formData = new FormData();
+    formData.append('product_id', productId);
+
+    fetch('/customer/wishlist/toggle', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Server response:', data); // Debugging line
+        if (data.success) {
+            const icon = document.querySelector(`#wishlist-icon-${productId}`);
+            if (data.wishlisted) {
+                icon.classList.add('text-danger'); // Add red color
+                alert('Product added to wishlist.');
+            } else {
+                icon.classList.remove('text-danger'); // Remove red color
+                alert('Product removed from wishlist.');
+            }
+        } else {
+            alert(data.message || 'Failed to toggle wishlist.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An unexpected error occurred. Please try again later.');
+    });
+}
+
+        // Filter Products
+        function filterProducts(categoryId) {
+            const shopName = document.querySelector('header h1').textContent;
+
+            fetch(`/filter_products?category_id=${categoryId}&shop_name=${encodeURIComponent(shopName)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const productsList = document.getElementById('products-list');
+                    productsList.innerHTML = '';
+
+                    if (data.products && Array.isArray(data.products)) {
+                        if (data.products.length === 0) {
+                            productsList.innerHTML = '<p>No products found for the selected filters.</p>';
+                        } else {
+                            data.products.forEach(product => {
+                                const productCard = document.createElement('div');
+                                productCard.classList.add('product-card');
+                                productCard.innerHTML = `
+                                    <img src="/static/products/images/${product.image}" alt="${product.name}">
+                                    <h3>${product.name}</h3>
+                                    <p>${product.description}</p>
+                                    <p><strong>Brand:</strong> ${product.brand}</p>
+                                    <p><strong>Cost Price:</strong> $${product.cost_price}</p>
+                                    <p><strong>Selling Price:</strong> $${product.selling_price}</p>
+                                    <p>Price: $${product.price}</p>
+                                    <form id="add-to-cart-form-${product.id}" action="/add_to_cart" method="POST">
+                                        <input type="hidden" name="product_id" value="${product.id}">
+                                        <button type="button" class="btn btn-primary mb-2 add-to-cart-btn">Add to Cart</button>
+                                    </form>
+                                `;
+                                productsList.appendChild(productCard);
+                            });
+                        }
+                    } else {
+                        productsList.innerHTML = '<p>No products found for the selected filters.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error filtering products:', error);
+                    document.getElementById('products-list').innerHTML = '<p>No products found for the selected filters.</p>';
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <style>
+        body, html {
+            height: 100%;
+            overflow: hidden; /* Prevents scrolling on the entire page */
+        }
+        .navbar {
+            background-color: rgb(232, 237, 245);
+            color: #000000;
+            z-index: 10;
+        }
+        .navbar-brand {
+            color: #000000 !important; /* Black company name */
+            font-weight: bold; /* Bold font weight */
+        }
+        .navbar-nav .nav-link {
+            color: #000000 !important; /* Black links */
+        }
+        .sidebar {
+            background-color:  rgb(232, 237, 245);
+            padding: 15px;
+            width: 25%; /* Adjusted width for the sidebar */
+            border-right: 1px solid #e9ecef;
+            height: 100vh; /* Full height sidebar */
+            position: fixed; /* Fixes the sidebar position */
+            left: 0; /* Ensures it stays on the left */
+            top: 0; /* Starts from the top of the viewport */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 2; /* Ensure sidebar is above footer */
+        }
+        .sidebar img {
+            max-width: 100%;
+            height: 100vh;
+            max-height: 80vh; /* Adjust height to prevent overflow */
+            width: auto; /* Ensure image responsiveness */
+        }
+        .main-content {
+            width: 100%;
+            padding: 20px;
+            margin-left: 25%; /* Adjust margin to accommodate fixed sidebar width */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Ensure content area is at least full viewport height */
+            position: relative; /* Relative positioning for footer */
+            z-index: 1; /* Ensure content is above sidebar */
+        }
+        .form-container {
+            max-width: 400px; /* Example max-width for the form */
+            width: 100%;
+        }
+        .footer {
+            width: 100%;
+            background-color: #ffffff; /* Dark background */
+            color: #000000; /* White text */
+            text-align: center; /* Center align text */
+            padding: 10px 0; /* Padding top and bottom */
+            position: fixed; /* Fixed positioning */
+            bottom: 0; /* Stick to the bottom */
+            z-index: 0; /* Ensure footer is behind content */
+            margin-left: 15%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Content with Navbar -->
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="/">BuyDirect</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/" style="color: #000000;">Home</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="row">
+            <!-- Sidebar with fixed vertical image -->
+            <div class="col-md-3 sidebar">
+                <!-- Fixed image -->
+                <img src="{{ url_for('static', filename='login/shop_log.jpg') }}" class="img-fluid" alt="Sidebar Image">
+            </div>
+            <!-- Main content area -->
+            <div class="col-md-9 main-content">
+                <div class="container form-container">
+                    <h2>Login as Shopkeeper</h2>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            <div class="alert-container">
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('shopkeeper_bp.login_shopkeeper') }}">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                    <p>Don't have an account? <a href="{{ url_for('shopkeeper_bp.register_shopkeeper') }}">Register here</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 BuyDirect. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="{{ url_for('static', filename='js/jquery-3.3.1.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+</body>
+</html>

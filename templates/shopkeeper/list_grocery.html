@@ -1,0 +1,295 @@
+{% extends 'shopkeeper/shopkeeper_dashboard.html' %}
+
+{% block title %}Grocery List{% endblock %}
+
+{% block content %}
+
+   
+            <h3>List of Groceries</h3>
+        </div>
+   
+            <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createGroceryModal">Create Grocery</button>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Description</th>
+                            <th>Cost Price</th>
+                            <th>Selling Price</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Core Category</th>
+                            <th>Subcategory</th>
+                            <th>Brand</th>
+                            <th>MFG Date</th>
+                            <th>Expiry Date</th>
+                            <th>Image</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for grocery in groceries %}
+                        <tr>
+                            <td>{{ grocery.id }}</td>
+                            <td>{{ grocery.name }}</td>
+                            <td>{{ grocery.description }}</td>
+                            <td>{{ grocery.cost_price }}</td>
+                            <td>{{ grocery.selling_price }}</td>
+                            <td>{{ grocery.quantity }}</td>
+                            <td>{{ grocery.unit }}</td>
+                            <td>{{ grocery.core_category_name if grocery.core_category_name else 'No Core Category' }}</td>
+                            <td>{{ grocery.subcategory_name if grocery.subcategory_name else 'No Subcategory' }}</td>
+                            <td>{{ grocery.brand_name if grocery.brand_name else 'No Brand Available' }}</td>
+                            <td>{{ grocery.mfg_date }}</td>
+                            <td>{{ grocery.expiry_date }}</td>
+                            <td>
+                                {% if grocery.image %}
+                                <img src="{{ url_for('static', filename='products/images/' + grocery.image) }}" alt="{{ grocery.name }}" style="max-width: 50px; max-height: 50px; object-fit: cover;">
+                                {% else %}
+                                    <span>No Image Available</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editGroceryModal{{ grocery.id }}">Edit</button>
+                                <form method="POST" action="{{ url_for('grocery_bp.delete_grocery', grocery_id=grocery.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Grocery Modal -->
+<div class="modal fade" id="createGroceryModal" tabindex="-1" role="dialog" aria-labelledby="createGroceryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createGroceryModalLabel">Create Grocery</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('grocery_bp.create_grocery') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="groceryName">Product Name</label>
+                        <input type="text" class="form-control" id="groceryName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="groceryDescription">Description</label>
+                        <textarea class="form-control" id="groceryDescription" name="description" rows="4" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="groceryCostPrice">Cost Price</label>
+                            <input type="number" class="form-control" id="groceryCostPrice" name="cost_price" step="0.01" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="grocerySellingPrice">Selling Price</label>
+                            <input type="number" class="form-control" id="grocerySellingPrice" name="selling_price" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="groceryQuantity">Quantity</label>
+                            <input type="number" class="form-control" id="groceryQuantity" name="quantity" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="groceryUnit">Unit</label>
+                            <input type="text" class="form-control" id="groceryUnit" name="unit" required>
+                        </div>
+                    </div>
+                   
+                    <!-- Core Category, Subcategory, Brand -->
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="modal_core_category">Core Category</label>
+                            <select class="form-control" id="modal_core_category" name="core_category_id" required>
+                                {% for core_category in core_categories %}
+                                    <option value="{{ core_category[0] }}">{{ core_category[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="modal_subcategory">Subcategory</label>
+                            <select class="form-control" id="modal_subcategory" name="subcategory" required>
+                                <option value="">Select Subcategory</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="modal_brand">Brand</label>
+                            <select class="form-control" id="modal_brand" name="brand">
+                                {% for brand in brands %}
+                                    <option value="{{ brand[0] }}">{{ brand[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="groceryMfgDate">Manufacturing Date</label>
+                            <input type="date" class="form-control" id="groceryMfgDate" name="mfg_date" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="groceryExpiryDate">Expiry Date</label>
+                            <input type="date" class="form-control" id="groceryExpiryDate" name="expiry_date" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="groceryImage">Product Image</label>
+                        <input type="file" class="form-control-file" id="groceryImage" name="image" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Grocery Modal -->
+{% for grocery in groceries %}
+<div class="modal fade" id="editGroceryModal{{ grocery.id }}" tabindex="-1" role="dialog" aria-labelledby="editGroceryModalLabel{{ grocery.id }}" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editGroceryModalLabel{{ grocery.id }}">Edit Grocery</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('grocery_bp.update_grocery', grocery_id=grocery.id) }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="editGroceryName{{ grocery.id }}">Product Name</label>
+                        <input type="text" class="form-control" id="editGroceryName{{ grocery.id }}" name="name" value="{{ grocery.name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editGroceryDescription{{ grocery.id }}">Description</label>
+                        <textarea class="form-control" id="editGroceryDescription{{ grocery.id }}" name="description" rows="4" required>{{ grocery.description }}</textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="editGroceryCostPrice{{ grocery.id }}">Cost Price</label>
+                            <input type="number" class="form-control" id="editGroceryCostPrice{{ grocery.id }}" name="cost_price" value="{{ grocery.cost_price }}" step="0.01" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editGrocerySellingPrice{{ grocery.id }}">Selling Price</label>
+                            <input type="number" class="form-control" id="editGrocerySellingPrice{{ grocery.id }}" name="selling_price" value="{{ grocery.selling_price }}" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="editGroceryQuantity{{ grocery.id }}">Quantity</label>
+                            <input type="number" class="form-control" id="editGroceryQuantity{{ grocery.id }}" name="quantity" value="{{ grocery.quantity }}" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editGroceryUnit{{ grocery.id }}">Unit</label>
+                            <input type="text" class="form-control" id="editGroceryUnit{{ grocery.id }}" name="unit" value="{{ grocery.unit }}" required>
+                        </div>
+                    </div>
+                   
+                  <!-- Form fields aligned in one row -->
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label for="edit_modal_core_category{{ grocery.id }}">Core Category</label>
+        <select class="form-control edit-core-category" id="edit_modal_core_category{{ grocery.id }}" name="core_category_id" data-target-dropdown="edit_modal_subcategory{{ grocery.id }}" required>
+            {% for core_category in core_categories %}
+                <option value="{{ core_category[0] }}" {% if core_category[0] == grocery.core_category_id %}selected{% endif %}>{{ core_category[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group col-md-4">
+        <label for="edit_modal_subcategory{{ grocery.id }}">Subcategory</label>
+        <select class="form-control" id="edit_modal_subcategory{{ grocery.id }}" name="subcategory" required>
+            <option value="">Select Subcategory</option>
+        </select>
+    </div>
+    <div class="form-group col-md-4">
+        <label for="edit_modal_brand{{ grocery.id }}">Brand</label>
+        <select class="form-control" id="edit_modal_brand{{ grocery.id }}" name="brand">
+            {% for brand in brands %}
+                <option value="{{ brand[0] }}" {% if brand[0] == grocery.brand_id %}selected{% endif %}>{{ brand[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+  <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="editGroceryMfgDate{{ grocery.id }}">Manufacturing Date</label>
+                            <input type="date" class="form-control" id="editGroceryMfgDate{{ grocery.id }}" name="mfg_date" value="{{ grocery.mfg_date }}" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editGroceryExpiryDate{{ grocery.id }}">Expiry Date</label>
+                            <input type="date" class="form-control" id="editGroceryExpiryDate{{ grocery.id }}" name="expiry_date" value="{{ grocery.expiry_date }}" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editGroceryImage{{ grocery.id }}">Product Image</label>
+                        <input type="file" class="form-control-file" id="editGroceryImage{{ grocery.id }}" name="image" accept="image/*">
+                        {% if grocery.image %}
+                            <img src="{{ url_for('static', filename='products/images/' ~ grocery.image) }}" alt="Current Image" class="img-fluid mt-2" style="max-width: 100px; max-height: 100px; object-fit: cover;">
+                        {% else %}
+                            <p>No image available</p>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+<!-- JavaScript Section -->
+<script>
+    function populateSubcategories(coreCategoryId, targetDropdownId) {
+    $.ajax({
+        url: `/shopkeeper/get_subcategories/${coreCategoryId}`,
+        method: 'GET',
+        success: function(data) {
+            const subcategoryDropdown = $(`#${targetDropdownId}`);
+            subcategoryDropdown.empty().append('<option value="">Select Subcategory</option>');
+            data.forEach(subcategory => {
+                subcategoryDropdown.append(`<option value="${subcategory.id}">${subcategory.name}</option>`);
+            });
+        },
+        error: function() {
+            alert('Error fetching subcategories.');
+        }
+    });
+}
+
+$(document).ready(function() {
+    // Populate subcategories for create modal
+    $('#modal_core_category').change(function() {
+        const coreCategoryId = $(this).val();
+        populateSubcategories(coreCategoryId, 'modal_subcategory');
+    });
+
+    // Populate subcategories for each edit modal
+    $('.edit-core-category').change(function() {
+        const coreCategoryId = $(this).val();
+        const targetDropdownId = $(this).data('target-dropdown');
+        populateSubcategories(coreCategoryId, targetDropdownId);
+    });
+});
+
+</script>
+<style>.small-image {
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: cover; /* Ensures the image fits within the bounds */
+}
+</style>
+
+{% endblock %}

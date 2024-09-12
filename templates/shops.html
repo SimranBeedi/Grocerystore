@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <!-- Static shop data start -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card topstore-card">
+                    <div class="row no-gutters">
+                        <div class="col-md-5">
+                            <div class="card-img-container">
+                                <img src="{{ url_for('static', filename='images/shop1.jpg') }}" class="card-img" alt="Shop 1">
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card-body">
+                                <h5 class="card-title">Shop 1</h5>
+                                <p class="card-text">Locality: Locality 1</p>
+                                <a href="#" class="btn btn-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card topstore-card">
+                    <div class="row no-gutters">
+                        <div class="col-md-5">
+                            <div class="card-img-container">
+                                <img src="{{ url_for('static', filename='images/shop2.jpg') }}" class="card-img" alt="Shop 2">
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card-body">
+                                <h5 class="card-title">Shop 2</h5>
+                                <p class="card-text">Locality: Locality 2</p>
+                                <a href="#" class="btn btn-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card topstore-card">
+                    <div class="row no-gutters">
+                        <div class="col-md-5">
+                            <div class="card-img-container">
+                                <img src="{{ url_for('static', filename='images/shop3.jpg') }}" class="card-img" alt="Shop 3">
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card-body">
+                                <h5 class="card-title">Shop 3</h5>
+                                <p class="card-text">Locality: Locality 3</p>
+                                <a href="#" class="btn btn-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Static shop data end -->
+        </div>
+    </div>
+</body>
+</html>

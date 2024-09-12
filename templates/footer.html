@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Footer Example</title>
+    <!-- Local Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <!-- Local Font Awesome CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@700&display=swap');
+
+        .custom-body1 {
+            background-color: #f3f6fd;
+            font-size: 13px;
+            font-weight: bold;
+            color: #bdc4cb;
+            font-family: 'Titillium Web', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 80vh;
+        }
+
+        .footer {
+            background-color: #24282f;
+            color: #ffffff;
+            padding: 30px 0;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .footer-content {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .footer ul {
+            padding: 0;
+            list-style-type: none;
+            margin-left: -10px;
+        }
+
+        .footer ul li {
+            color: #bdc4cb;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+        .footer ul li:hover {
+            color: #ffffff;
+        }
+
+        .footer .social i {
+            font-size: 20px;
+            padding: 5px;
+        }
+
+        .footer .social i:hover {
+            color: #957bda;
+            cursor: pointer;
+        }
+
+        .footer .copyright {
+            color: #bdc4cb;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .footer {
+                padding: 30px 10px;
+            }
+        }
+
+        .footer a {
+            color: #bdc4cb;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="custom-body1">
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex">
+                        <h1 class="font-weight-bold mr-2 px-3" style="background-color: #957bda;">Buy Direct</h1>
+                    </div>
+                    <h4>Save While You Shop</h4><hr>
+                    <p>Buy Direct is a digital platform revolutionizing local commerce by empowering small businesses and communities. It helps local shops thrive in the competitive digital landscape dominated by larger online stores.</p>
+                      <div class="social">
+                        <i class="fab fa-facebook-f"></i>
+                        <i class="fab fa-instagram"></i>
+                        <i class="fab fa-twitter"></i>
+                        <i class="fab fa-linkedin-in"></i>
+                        <i class="fab fa-facebook"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <h5 class="services">Useful Links</h5>
+                    <ul>
+                        <li><a href="{{ url_for('shopkeeper_bp.login_shopkeeper') }}">Retailer Login</a></li>
+                        <li><a href="{{ url_for('admin_bp.login_admin') }}">Admin Login</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-2">
+                    <h5 class="industries">Categories</h5>
+                    <ul>
+                        <li>Dry Fruits</li>
+                        <li>Atta, Rice & Dal</li>
+                        <li>Masala & Oil</li>
+                        <li>Cereals</li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h5 class="industries">More Categories</h5>
+                    <ul>
+                        <li>Sauces & Spreads</li>
+                        <li>Cleaning and Household</li>
+                    </ul>
+                </div>
+            </div>
+            <hr style="border-color: #384047;">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="copyright"><i class="fa fa-copyright"></i> 2024 Buy Direct</p>
+                </div>
+                <div class="col-md-6 text-right">
+                    <div class="policy">
+                        <div>Terms of Use</div>
+                        <div>Privacy Policy</div>
+                        <div>Cookie Policy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

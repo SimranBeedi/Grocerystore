@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <!-- Local Bootstrap CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  
+    <!-- FontAwesome CSS -->
+    <link href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.959);
+        }
+        .sidebar {
+            background-color: rgb(232, 237, 245);
+            padding: 15px;
+            width: 25%;
+            border-right: 1px solid #e9ecef;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .sidebar img {
+            max-width: 100%;
+            height: 100vh;
+            max-height: 80vh; /* Adjust height to prevent overflow */
+            width: auto; /* Ensure image responsiveness */
+        }
+        .main-content {
+            padding: 20px;
+            margin-left: 25%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Adjust the height to fill the remaining space */
+            position: relative; /* Set relative position for the footer alignment */
+        }
+        .form-container {
+            max-width: 700px;
+            width: 90%;
+            margin-bottom: 60px; /* Add space for footer */
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .footer {
+            width: calc(100% - 25%); /* Adjust width to be outside the sidebar */
+            background-color: #ffffff;
+            color: #000000;
+            text-align: center; /* Center text in footer */
+            padding: 10px 20px;
+            position: fixed;
+            bottom: 0;
+            left: 25%; /* Start after the sidebar */
+        }
+        .navbar {
+            background-color: rgb(232, 237, 245);
+            color: #000000;
+            z-index: 1;
+        }
+        .navbar-brand {
+            color: #000000 !important;
+            font-weight: bold;
+        }
+        .navbar-nav .nav-link {
+            color: #000000 !important;
+        }
+        .location-icon {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        .form-group.position-relative {
+            position: relative;
+        }
+        .password-valid {
+            color: green;
+        }
+        .password-error {
+            color: red;
+        }
+        .password-errors {
+            color: red;
+            list-style: none;
+            padding-left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="/">BuyDirect</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/" style="color: #000000;">Home</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="row">
+            <!-- Sidebar with fixed vertical image -->
+            <div class="col-md-4 sidebar">
+                <!-- Fixed image -->
+                <img src="{{ url_for('static', filename='login/shop_log.jpg') }}" class="img-fluid" alt="Sidebar Image">
+            </div>
+            <!-- Main content area -->
+            <div class="col-md-8 main-content">
+                <div class="container form-container">
+                    <h2>Login as Shopkeeper</h2>
+                    <hr>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            <div class="alert-container">
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('shopkeeper_bp.register_shopkeeper') }}" enctype="multipart/form-data" onsubmit="return validatePassword()">
+                        <!-- First row: Username and Password -->
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="username">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                     <ul id="passwordErrors" class="password-errors"></ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Second row: Email ID and Shop Name -->
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="email">Email ID</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="shop_name">Shop Name</label>
+                                <input type="text" class="form-control" id="shop_name" name="shop_name" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Third row: District and Locality -->
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="district">District</label>
+                                <select class="form-control" id="district" name="district" required>
+                                    <option value="">Select District</option>
+                                    <option value="Dharwad">Dharwad</option>
+                                    <option value="Hubli">Hubli</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6 position-relative">
+                                <label for="locality">Locality</label>
+                                <select class="form-control" id="locality" name="locality" required>
+                                    <option value="">Select Locality</option>
+                                    <!-- Options will be dynamically populated by JavaScript -->
+                                </select>
+                                <i class="fas fa-map-marker-alt location-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Fourth row: Address -->
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                        </div>
+                        
+                        <!-- Fifth row: Image and Document -->
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="image">Image</label>
+                                <input type="file" class="form-control-file" id="image" name="image" accept="image/*" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="document">Document</label>
+                                <input type="file" class="form-control-file" id="document" name="document" accept=".pdf,.doc,.docx" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Register</button>Already have an account? <a href="{{ url_for('shopkeeper_bp.login_shopkeeper') }}">Login here</a>
+      
+                    </form>
+                          </div>
+                <footer class="footer">
+                    <div class="container">
+                        <p>&copy; 2024 Your Company. All rights reserved.</p>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- Local Bootstrap JS and dependencies -->
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+
+    <script>
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+            var errors = [];
+            var passwordHelp = document.getElementById("passwordHelp");
+            var passwordErrors = document.getElementById("passwordErrors");
+            passwordErrors.innerHTML = "";
+
+            if (password.length < 8) {
+                errors.push("Password must be at least 8 characters long.");
+            }
+            if (!/[A-Z]/.test(password)) {
+                errors.push("Password must contain at least one uppercase letter.");
+            }
+            if (!/[a-z]/.test(password)) {
+                errors.push("Password must contain at least one lowercase letter.");
+            }
+            if (!/[0-9]/.test(password)) {
+                errors.push("Password must contain at least one digit.");
+            }
+            if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                errors.push("Password must contain at least one special character.");
+            }
+
+            if (errors.length > 0) {
+                passwordErrors.innerHTML = errors.map(function(error) {
+                    return "<li>" + error + "</li>";
+                }).join("");
+                passwordHelp.classList.add("password-error");
+                return false; // Prevent form submission
+            } else {
+                passwordHelp.classList.remove("password-error");
+                passwordHelp.classList.add("password-valid");
+                return true; // Allow form submission
+            }
+        }
+
+        document.getElementById("password").addEventListener("input", validatePassword);
+
+                // Define an object mapping districts to localities
+                const districtLocalities = {
+            "Dharwad": ["Kamlapur","Malapur", "Gandhi Chowk","Kalyan Nagar", "Maratha Colony","Saptapur"],
+            "Hubli": ["Akshay Colony", "Gokul", "Vidya Nagar"]
+            // Add more districts and localities as needed
+        };
+
+        // Function to populate localities based on selected district
+        function populateLocalities(selectedDistrict) {
+            const localities = districtLocalities[selectedDistrict] || [];
+            const localityDropdown = document.getElementById("locality");
+            localityDropdown.innerHTML = '<option value="">Select Locality</option>';
+            localities.forEach(locality => {
+                const option = document.createElement("option");
+                option.value = locality;
+                option.textContent = locality;
+                localityDropdown.appendChild(option);
+            });
+        }
+
+        // Event listener for district dropdown change
+        document.getElementById("district").addEventListener("change", function() {
+            const selectedDistrict = this.value;
+            populateLocalities(selectedDistrict);
+        });
+
+
+    </script>
+</body>
+</html>

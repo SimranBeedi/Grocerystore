@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopkeeper Dashboard</title>
+    <!-- Local Bootstrap CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  
+    <!-- FontAwesome CSS -->
+    <link href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}" rel="stylesheet">
+    <style>
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100vh;
+            overflow-y: auto;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            background-color: #343a40;
+            color: #000000;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(141, 29, 29, 0.1);
+            z-index: 2; /* Ensure sidebar is above footer */
+        }
+        /* Sidebar Styles */
+.list-group {
+    position: fixed; /* Fixed positioning */
+    top: 52px; /* Distance from top */
+    left: 0; /* Stick to left side */
+    bottom: 40px; /* Extend to just above the footer */
+    width: 250px; /* Fixed width */
+    background-color: #343a40; /* Updated to a dark grey for consistency */
+    color: rgb(0, 0, 0); /* White text */
+    padding: 15px; /* Padding inside */
+    overflow-y: auto; /* Enable vertical scrolling */
+    z-index: 1; /* Ensure it's above other content */
+}
+
+/* Adjustments for responsive design */
+@media (max-width: 768px) {
+    .list-group {
+        position: relative; /* Change positioning for smaller screens */
+        top: 0;
+        left: 0;
+        bottom: auto; /* Remove bottom spacing */
+        width: 100%; /* Full width on smaller screens */
+        height: auto; /* Height auto-adjusts based on content */
+        background-color: #343a40; /* Consistent dark background */
+        padding: 10px; /* Adjust padding */
+    }
+}
+
+        .sidebar .list-group-item {
+            border-radius: 0;
+            border: none;
+            padding: 15px 20px;
+        }
+        .sidebar .list-group-item.active {
+            background-color: #007bff;
+            color: #000000;
+            font-weight: bold;
+        }
+        .sidebar .list-group-item-action {
+            color: #000000;
+        }
+        .sidebar .list-group-item-action:hover {
+            background-color: #495057;
+            color: #fff;
+        }
+        .sidebar .shop-name {
+            position: absolute;
+            bottom: 50px; /* Adjust position to make space for logout icon */
+            left: 0;
+            width: 100%;
+            background-color: #495057;
+            text-align: center;
+            padding: 10px;
+            border-top: 1px solid #6c757d;
+        }
+        .sidebar .shop-name strong {
+            color: #fff;
+        }
+        .sidebar .logout-icon {
+            position: absolute;
+            bottom: 2px; /* Adjust position as needed */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            color: #007bff;
+            cursor: pointer;
+        }
+        .sidebar .logout-icon:hover {
+            color: #0056b3;
+        }
+        
+        /* Main Content Styles */
+        main {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        
+        /* Tabs Styles */
+        .nav-tabs {
+            border-bottom: 2px solid #007bff;
+        }
+        .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+            color: #007bff;
+            font-weight: bold;
+            border: 2px solid #007bff;
+            border-radius: 0.25rem 0.25rem 0 0;
+        }
+        .nav-link {
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+            margin-right: 1px;
+        }
+        .nav-link:hover {
+            border-color: #ddd;
+        }
+
+        /* Footer Styles */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 250px; /* Ensure it starts where the sidebar ends */
+            width: calc(100% - 250px); /* Full width minus sidebar width */
+            background-color: #343a40;
+            color: #fff;
+            z-index: 1; /* Ensure footer is below sidebar */
+            border-top: 1px solid #dee2e6;
+            height: 5%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="sidebar">
+               <!-- sidebar.html -->
+<div class="list-group">
+    <a href="{{ url_for('shopkeeper_bp.shopkeeper_dashboard') }}" class="list-group-item list-group-item-action active">
+        Dashboard
+    </a>
+    
+    <a href="{{ url_for('brand_bp.list_brands') }}" class="list-group-item list-group-item-action">Brand List</a>
+    
+    <a href="{{ url_for('grocery_bp.list_grocery') }}" class="list-group-item list-group-item-action">Grocery List</a>
+    <a href="{{ url_for('shopkeeper_bp.shopkeeper_orders') }}" class="list-group-item list-group-item-action">Orders</a> 
+    <!-- Shop name at the bottom -->
+    <div class="shop-name">
+        <strong>Shop Name:</strong> {{ shop_name }}
+    </div>
+  <!-- Logout icon -->
+    <a href="{{ url_for('shopkeeper_bp.logout_shopkeeper') }}" class="logout-icon">
+        <i class="fas fa-sign-out-alt"></i>
+    </a>
+
+
+    <!-- Add more sidebar links as needed -->
+</div>
+
+            </div>
+            <main class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <div class="container" id="dashboard-content">
+                    {% block content %}
+                    <!-- Main content here -->
+                    {% endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- jQuery, Popper.js, and Bootstrap JS -->
+   
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3">
+        <div class="container text-center">
+            <span class="text-muted">Shopkeeper Dashboard &copy; 2024</span>
+        </div>
+    </footer>
+</body>
+</html>

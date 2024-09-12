@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Cards with Discount</title>
+  <!-- Local Bootstrap CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <!-- Local FontAwesome CSS for icons -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
+  <!-- Custom CSS for product cards -->
+  <style>
+    body {
+      background-color: #0080ff;
+    }
+    .product-card {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      background-color: #fff;
+      width: 225px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease-in-out;
+      height: 100%;
+    }
+    .product-card img {
+      width: 100%; /* Ensures image fills the card width */
+      height: 150px; /* Fixed height for images */
+      object-fit: cover; /* Ensures image covers the area without distortion */
+      border-radius: 5px; /* Optional: Adds rounded corners to images */
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    }
+    .product-card .card-title {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .product-card .card-text {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    .product-card .btn {
+      width: 80%;
+      margin-top: 10px;
+      font-size: 1.1rem;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .product-card .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    .product-card .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+    .original-price {
+      color: #aaa; /* Color for original price */
+      text-decoration: line-through; /* Strikethrough for original price */
+      margin-bottom: 5px;
+    }
+    .discounted-price {
+      color: #007bff; /* Color for discounted price */
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+    .explore-all-btn {
+      margin-top: 30px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .explore-all-btn a {
+      display: inline-block;
+      padding: 15px 30px;
+      background-color: #007bff;
+      color: #fff;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+    .explore-all-btn a:hover {
+      background-color: #0056b3;
+    }
+    .cart-icon {
+      position: relative;
+    }
+    .cart-count {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 12px;
+    }
+    /* Custom styles for modal */
+    .modal-body {
+      display: flex;
+      justify-content: center;
+    }
+    .form-container {
+      width: 100%;
+    }
+    .flash-messages {
+      margin: 20px;
+    }
+    .alert {
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .alert-warning {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  </style>
+</head>
+<body>
+  <!-- Display flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-messages">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  {% endwith %}
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="topstores-header">
+        <h1 class="topstore-heading">Top Products</h1>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mt-5">
+    <div class="row">
+      {% for product in products %}
+      <!-- Product Card -->
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card d-flex flex-column justify-content-between">
+          <a href="{{ url_for('customer_bp.product_detail', product_id=product[0]) }}">
+            <img src="{{ url_for('static', filename='products/images/' ~ product[4]) }}" alt="{{ product[1] }} Image" class="mb-3">
+          </a>
+          <div>
+            <h5 class="card-title">{{ product[1] }}</h5>
+            <p class="card-text">{{ product[2] }}</p>
+            <p><strong>Brand:</strong> {{ product[8] }}</p>
+            <p class="discounted-price">₹{{ product[3] }}</p>
+
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div> <!-- /.row -->
+
+    <!-- Explore All Button -->
+    <div class="explore-all-btn">
+      <a href="{{ url_for('customer_bp.explore') }}" class="btn btn-lg">Explore All <i class="fas fa-chevron-right"></i></a>
+    </div>
+  </div> <!-- /.container -->
+
+  <!-- Local JS and dependencies -->
+  <script src="{{ url_for('static', filename='js/jquery-3.3.1.slim.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+  <!-- Custom JS -->
+  <script>
+    function addToCart(productId) {
+        const form = document.getElementById(`add-to-cart-form-${productId}`);
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server response:', data);
+            if (data.success) {
+                document.getElementById('cart-count').textContent = data.cart_count;
+                alert('Item added to cart successfully!');
+            } else {
+                alert(data.message || 'Failed to add item to cart.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An unexpected error occurred. Please try again later.');
+        });
+    }
+function toggleWishlist(productId) {
+    const formData = new FormData();
+    formData.append('product_id', productId);
+
+    fetch('/customer/wishlist/toggle', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Server response:', data); // Debugging line
+        if (data.success) {
+            const icon = document.querySelector(`#wishlist-icon-${productId}`);
+            if (data.wishlisted) {
+                icon.classList.add('text-danger'); // Add red color
+                alert('Product added to wishlist.');
+            } else {
+                icon.classList.remove('text-danger'); // Remove red color
+                alert('Product removed from wishlist.');
+            }
+        } else {
+            alert(data.message || 'Failed to toggle wishlist.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An unexpected error occurred. Please try again later.');
+    });
+}
+
+
+
+  </script>

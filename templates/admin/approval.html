@@ -1,0 +1,26 @@
+{% extends "admin/admin_dashboard.html" %}
+
+{% block content %}
+    <h2>Pending Shopkeeper Approvals</h2>
+    <div class="container">
+        {% for shopkeeper in shopkeepers %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ shopkeeper.username }}</h5>
+                    <p class="card-text">Email: {{ shopkeeper.email }}</p>
+                    <p class="card-text">Address: {{ shopkeeper.address }}</p>
+                    {% if shopkeeper.registration_date %}
+                        <p class="card-text">Registered on: {{ shopkeeper.registration_date }}</p>
+                    {% else %}
+                        <p class="card-text">Registration date not available</p>
+                    {% endif %}
+                    <form method="post" action="{{ url_for('admin_bp.approval') }}">
+                        <input type="hidden" name="shopkeeper_id" value="{{ shopkeeper.id }}">
+                        <button type="submit" name="action" value="accept" class="btn btn-success mr-2">Accept</button>
+                        <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
